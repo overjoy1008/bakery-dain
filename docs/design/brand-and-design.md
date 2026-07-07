@@ -44,7 +44,7 @@ cute but clean
 ```txt
 소소하게 굽는 다닷네 베이커리
 예약한 만큼만 정성껏 만들어요.
-이번 주 메뉴를 확인하고 픽업 날짜를 선택해 주세요.
+이번 주 메뉴를 확인하고 예약 주문을 남겨 주세요.
 한 번에 많은 양을 만들기보다, 맛있게 드실 수 있는 만큼만 준비합니다.
 선물하기 좋은 구움과자와 계절 디저트를 만들어요.
 ```
@@ -70,7 +70,7 @@ Header
 Moving Notice Bar
 Hero Product Slideshow
 This Week's Menu
-Reservation Calendar Preview
+Reservation Order Preview
 How to Order
 Instagram Preview
 Footer

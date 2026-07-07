@@ -1,35 +1,14 @@
-import { ArrowRight, CalendarDays, Gift, Instagram, ShoppingBag } from "lucide-react";
-import { featuredBakes, noticeItems } from "../data/brandShell";
+import { Link } from "react-router-dom";
+import { ArrowRight, CalendarDays, Instagram, ShoppingBag } from "lucide-react";
+import { MenuSurface } from "../components/MenuSurface";
+import { SiteFooter } from "./SiteFooter";
 
 export function BrandShell() {
+  const instagramUrl =
+    "https://www.instagram.com/bakery_dain?igsh=MWxnb2FtcmJ5NGhyaQ==";
+
   return (
-    <main className="brand-shell">
-      <header className="site-header" aria-label="주요 메뉴">
-        <a className="brand-mark" href="#top" aria-label="다닷네 베이커리 홈">
-          <span className="brand-symbol">d</span>
-          <span>다닷네 베이커리</span>
-        </a>
-
-        <nav className="site-nav" aria-label="사이트 탐색">
-          <a href="#reserve">예약하기</a>
-          <a href="#menu">메뉴</a>
-          <a href="#pickup">픽업 안내</a>
-          <a href="#about">소개</a>
-        </nav>
-
-        <a className="icon-link" href="#menu" aria-label="메뉴 보러가기">
-          <ShoppingBag size={19} strokeWidth={1.9} />
-        </a>
-      </header>
-
-      <section className="notice-rail" aria-label="예약 안내">
-        <div className="notice-track">
-          {[...noticeItems, ...noticeItems].map((item, index) => (
-            <span key={`${item}-${index}`}>{item}</span>
-          ))}
-        </div>
-      </section>
-
+    <>
       <section className="hero-section" id="top">
         <img
           className="hero-image"
@@ -46,13 +25,13 @@ export function BrandShell() {
           </p>
 
           <div className="hero-actions">
-            <a className="primary-action" href="#menu">
+            <Link className="primary-action" to="/menu">
               이번 주 메뉴 보기
               <ArrowRight size={18} strokeWidth={1.9} />
-            </a>
-            <a className="secondary-action" href="#reserve">
-              예약 가능일 확인
-            </a>
+            </Link>
+            <Link className="secondary-action" to="/reserve">
+              예약 주문하기
+            </Link>
           </div>
         </div>
 
@@ -66,38 +45,31 @@ export function BrandShell() {
         <div className="section-heading">
           <p className="eyebrow">this week's tiny menu</p>
           <h2>이번 주에 어울리는 작은 달콤함</h2>
+          <p>
+            한 번에 많이 만들기보다 맛있게 드실 만큼만 준비해요. 메뉴를 고르고
+            가능한 픽업일에 맞춰 예약해 주세요.
+          </p>
         </div>
 
-        <div className="bake-list">
-          {featuredBakes.map((item) => (
-            <article className="bake-card" key={item.name}>
-              <span>{item.accent}</span>
-              <h3>{item.name}</h3>
-              <p>{item.note}</p>
-            </article>
-          ))}
-        </div>
+        <MenuSurface />
       </section>
 
       <section className="order-strip" id="reserve" aria-label="예약 흐름">
         <div>
-          <Gift size={22} strokeWidth={1.8} />
-          <span>예약 제작</span>
+          <ShoppingBag size={22} strokeWidth={1.8} />
+          <span>메뉴 확인</span>
         </div>
         <div>
           <CalendarDays size={22} strokeWidth={1.8} />
-          <span>픽업 중심</span>
+          <span>예약 주문</span>
         </div>
-        <div>
+        <a href={instagramUrl} rel="noreferrer" target="_blank">
           <Instagram size={22} strokeWidth={1.8} />
-          <span>인스타 연결 예정</span>
-        </div>
+          <span>인스타: @bakery_dain</span>
+        </a>
       </section>
 
-      <footer className="site-footer" id="pickup">
-        <span>다닷네 베이커리</span>
-        <span>소량 제작 · 예약 후 픽업 · 선물 포장 가능</span>
-      </footer>
-    </main>
+      <SiteFooter />
+    </>
   );
 }

@@ -7,6 +7,7 @@
 - [Product Plan](product/product-plan.md)
 - [KPI Plan](product/kpi-plan.md)
 - [Roadmap](product/roadmap.md)
+- [Slice 3 Reservation UX Shell](product/slice-3-reservation-ux.md)
 
 ## Design
 
