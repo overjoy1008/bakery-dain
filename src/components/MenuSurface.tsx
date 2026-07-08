@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-import { menuCategories, menuItems } from "../data/brandShell";
+import { fallbackMenuCatalog, loadMenuCatalog, type BakeryMenuItem } from "../lib/bakery-data";
 
 const priceFormatter = new Intl.NumberFormat("ko-KR", {
   currency: "KRW",
@@ -14,11 +14,43 @@ type MenuSurfaceProps = {
 };
 
 export function MenuSurface({ mode = "preview" }: MenuSurfaceProps) {
+  const [menuCatalog, setMenuCatalog] = useState(fallbackMenuCatalog);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const menuCategories = menuCatalog.categories;
+  const menuItems = menuCatalog.items;
   const visibleMenuItems =
     selectedCategory === "all"
       ? menuItems
       : menuItems.filter((item) => item.category === selectedCategory);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    loadMenuCatalog()
+      .then((catalog) => {
+        if (isMounted) {
+          setMenuCatalog(catalog);
+          setLoadFailed(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setMenuCatalog(fallbackMenuCatalog);
+          setLoadFailed(true);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className={`menu-surface menu-surface-${mode}`}>
@@ -36,8 +68,14 @@ export function MenuSurface({ mode = "preview" }: MenuSurfaceProps) {
         ))}
       </div>
 
-      <div className="menu-grid">
-        {visibleMenuItems.map((item) => (
+      {loadFailed && (
+        <p className="surface-message">
+          메뉴 정보를 원격에서 불러오지 못해 임시 메뉴를 보여드리고 있어요.
+        </p>
+      )}
+
+      <div className="menu-grid" aria-busy={isLoading}>
+        {visibleMenuItems.map((item: BakeryMenuItem) => (
           <article className="menu-card" key={item.id}>
             <div className="menu-image-wrap">
               <img className="menu-image" src={item.image} alt={item.imageAlt} />

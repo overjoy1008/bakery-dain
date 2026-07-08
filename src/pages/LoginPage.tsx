@@ -9,17 +9,21 @@ export function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const user = login(username, password);
+    setIsSubmitting(true);
+    setErrorMessage("");
 
-    if (!user) {
+    try {
+      await login(username, password);
+      navigate("/reserve");
+    } catch {
       setErrorMessage("아이디 또는 비밀번호를 다시 확인해 주세요.");
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    navigate("/reserve");
   };
 
   return (
@@ -63,9 +67,9 @@ export function LoginPage() {
 
               {errorMessage && <p className="form-error">{errorMessage}</p>}
 
-              <button className="submit-reservation" type="submit">
+              <button className="submit-reservation" disabled={isSubmitting} type="submit">
                 <UserRound size={17} strokeWidth={1.9} />
-                로그인하고 예약하기
+                {isSubmitting ? "로그인 중" : "로그인하고 예약하기"}
               </button>
             </form>
 

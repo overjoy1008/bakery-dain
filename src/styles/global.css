@@ -361,6 +361,13 @@ a {
   gap: 16px;
 }
 
+.surface-message {
+  margin: 0 0 14px;
+  color: var(--toast);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .menu-card {
   overflow: hidden;
   border: 1px solid rgba(59, 42, 34, 0.13);

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { apiRequest } from "./api";
 
 export type BakeryUser = {
+  id?: string;
   username: string;
   password: string;
   name: string;
@@ -11,26 +13,15 @@ export type BakeryUser = {
 
 export type BakerySessionUser = Omit<BakeryUser, "password">;
 
-const USERS_KEY = "bakery-dain-users";
 const SESSION_KEY = "bakery-dain-session";
 const AUTH_CHANGE_EVENT = "bakery-dain-auth-change";
 
-function readUsers(): BakeryUser[] {
-  if (typeof window === "undefined") {
-    return [];
-  }
+type AuthResponse = {
+  token: string;
+  user: BakerySessionUser;
+};
 
-  try {
-    const users = window.localStorage.getItem(USERS_KEY);
-    return users ? (JSON.parse(users) as BakeryUser[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeUsers(users: BakeryUser[]) {
-  window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
+type StoredSession = AuthResponse;
 
 function emitAuthChange() {
   window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
@@ -42,47 +33,61 @@ export function getCurrentUser(): BakerySessionUser | null {
   }
 
   try {
-    const user = window.localStorage.getItem(SESSION_KEY);
-    return user ? (JSON.parse(user) as BakerySessionUser) : null;
+    const session = window.localStorage.getItem(SESSION_KEY);
+    return session ? (JSON.parse(session) as StoredSession).user : null;
   } catch {
     return null;
   }
 }
 
-export function isUsernameTaken(username: string) {
-  const normalizedUsername = username.trim().toLowerCase();
-  return readUsers().some((user) => user.username.toLowerCase() === normalizedUsername);
-}
-
-export function createUser(user: BakeryUser) {
-  if (isUsernameTaken(user.username)) {
+export function getAuthToken() {
+  if (typeof window === "undefined") {
     return null;
   }
 
-  const nextUsers = [...readUsers(), user];
-  writeUsers(nextUsers);
-
-  const { password: _password, ...sessionUser } = user;
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
-  emitAuthChange();
-  return sessionUser;
+  try {
+    const session = window.localStorage.getItem(SESSION_KEY);
+    return session ? (JSON.parse(session) as StoredSession).token : null;
+  } catch {
+    return null;
+  }
 }
 
-export function login(username: string, password: string) {
-  const normalizedUsername = username.trim().toLowerCase();
-  const user = readUsers().find(
-    (savedUser) =>
-      savedUser.username.toLowerCase() === normalizedUsername && savedUser.password === password,
+function saveSession(session: StoredSession) {
+  window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  emitAuthChange();
+  return session.user;
+}
+
+export async function isUsernameTaken(username: string) {
+  const response = await apiRequest<{ available: boolean }>(
+    `/auth/username/check?username=${encodeURIComponent(username.trim())}`,
   );
+  return !response.available;
+}
 
-  if (!user) {
-    return null;
-  }
+export async function createUser(user: BakeryUser) {
+  const response = await apiRequest<AuthResponse>("/auth/signup", {
+    body: user,
+    method: "POST",
+  });
+  return saveSession(response);
+}
 
-  const { password: _password, ...sessionUser } = user;
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+export async function login(username: string, password: string) {
+  const response = await apiRequest<AuthResponse>("/auth/login", {
+    body: {
+      password,
+      username,
+    },
+    method: "POST",
+  });
+  return saveSession(response);
+}
+
+export function logout() {
+  window.localStorage.removeItem(SESSION_KEY);
   emitAuthChange();
-  return sessionUser;
 }
 
 export function useAuthUser() {

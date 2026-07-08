@@ -8,6 +8,8 @@
 - [KPI Plan](product/kpi-plan.md)
 - [Roadmap](product/roadmap.md)
 - [Slice 3 Reservation UX Shell](product/slice-3-reservation-ux.md)
+- [Slice 4 Backend Skeleton](product/slice-4-backend-skeleton.md)
+- [Slice 5 Data Layer](product/slice-5-data-layer.md)
 
 ## Design
 
@@ -33,6 +35,7 @@
 
 - [Development Ground Rules](operations/development-ground-rules.md)
 - [Delivery Plan](operations/delivery-plan.md)
+- [Cloudflare Setup](operations/cloudflare-setup.md)
 - [Risk Register](operations/risk-register.md)
 
 ## References

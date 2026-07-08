@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronDown, Minus, Plus, ReceiptText, ShoppingCart, UserRound } from "lucide-react";
-import { menuItems } from "../data/brandShell";
-import { adminPickupRule, pickupDays } from "../data/reservation";
-import { useAuthUser } from "../lib/auth";
+import { apiRequest } from "../lib/api";
+import {
+  fallbackMenuCatalog,
+  loadMenuCatalog,
+  loadPickupDays,
+  type BakeryMenuItem,
+  type PickupDay,
+} from "../lib/bakery-data";
+import { getAuthToken, useAuthUser } from "../lib/auth";
 import { SiteFooter } from "../sections/SiteFooter";
 
 const priceFormatter = new Intl.NumberFormat("ko-KR", {
@@ -21,20 +27,47 @@ function getSelectedMenuIds(selectedMenus: SelectedMenus) {
     .map(([menuId]) => menuId);
 }
 
-function getDaysFromBase(dateString: string) {
-  const baseTime = new Date(`${adminPickupRule.baseDate}T00:00:00`).getTime();
-  const targetTime = new Date(`${dateString}T00:00:00`).getTime();
-  return Math.round((targetTime - baseTime) / 86_400_000);
+type CreateReservationResponse = {
+  reservation: {
+    id: string;
+    number: string;
+    paymentStatus: string;
+    status: string;
+    totalAmount: number;
+  };
+};
+
+async function submitReservation(payload: {
+  customer: {
+    address: string;
+    email: string;
+    name: string;
+    phone: string;
+  };
+  items: Array<{
+    itemId: string;
+    quantity: number;
+  }>;
+  pickupDate: string;
+  pickupTime: string;
+  requestNote: string;
+}) {
+  return apiRequest<CreateReservationResponse>("/reservations", {
+    body: payload,
+    method: "POST",
+    token: getAuthToken(),
+  });
 }
 
 export function ReservationPage() {
   const [searchParams] = useSearchParams();
   const currentUser = useAuthUser();
   const initialMenuId = searchParams.get("menu");
-  const hasInitialMenu = menuItems.some((item) => item.id === initialMenuId);
-  const [selectedMenus, setSelectedMenus] = useState<SelectedMenus>(
-    hasInitialMenu && initialMenuId ? { [initialMenuId]: 1 } : {},
-  );
+  const [menuItems, setMenuItems] = useState<BakeryMenuItem[]>(fallbackMenuCatalog.items);
+  const [pickupDays, setPickupDays] = useState<PickupDay[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [dataLoadFailed, setDataLoadFailed] = useState(false);
+  const [selectedMenus, setSelectedMenus] = useState<SelectedMenus>({});
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -44,6 +77,9 @@ export function ReservationPage() {
   const [memo, setMemo] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [reservationNumber, setReservationNumber] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const reservationType: ReservationType = currentUser ? "member" : "guest";
   const selectedMenuIds = useMemo(() => getSelectedMenuIds(selectedMenus), [selectedMenus]);
@@ -59,10 +95,53 @@ export function ReservationPage() {
         (day) =>
           day.status !== "day_off" &&
           selectedMenuIds.length > 0 &&
-          getDaysFromBase(day.date) >= requiredPrepDays,
+          day.leadDays >= requiredPrepDays,
       ),
     [requiredPrepDays, selectedMenuIds.length],
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    Promise.all([loadMenuCatalog(), loadPickupDays()])
+      .then(([catalog, days]) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setMenuItems(catalog.items);
+        setPickupDays(days);
+        setDataLoadFailed(false);
+
+        if (initialMenuId) {
+          const initialItem = catalog.items.find(
+            (item) => item.id === initialMenuId || item.slug === initialMenuId,
+          );
+
+          if (initialItem) {
+            setSelectedMenus((currentMenus) =>
+              Object.keys(currentMenus).length > 0 ? currentMenus : { [initialItem.id]: 1 },
+            );
+          }
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setMenuItems(fallbackMenuCatalog.items);
+          setPickupDays([]);
+          setDataLoadFailed(true);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsDataLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialMenuId]);
 
   useEffect(() => {
     if (selectedMenuIds.length === 0) {
@@ -109,22 +188,59 @@ export function ReservationPage() {
       agreed,
   );
 
-  const reservationNumber = `BD-${selectedDate.replaceAll("-", "").slice(2)}-0001`;
-
   const updateMenuQuantity = (menuId: string, nextQuantity: number) => {
     setSelectedMenus((currentMenus) => {
-      const normalizedQuantity = Math.max(0, Math.min(6, nextQuantity));
+      const item = menuItems.find((menuItem) => menuItem.id === menuId);
+      const maxQuantity = item?.maxPerPerson ?? 6;
+      const boundedQuantity = Math.max(0, Math.min(maxQuantity, nextQuantity));
       const nextMenus = { ...currentMenus };
 
-      if (normalizedQuantity === 0) {
+      if (boundedQuantity === 0) {
         delete nextMenus[menuId];
       } else {
-        nextMenus[menuId] = normalizedQuantity;
+        nextMenus[menuId] = boundedQuantity;
       }
 
       return nextMenus;
     });
     setSubmitted(false);
+    setReservationNumber("");
+    setSubmitError("");
+  };
+
+  const handleSubmit = async () => {
+    if (!isReady) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+    setSubmitted(false);
+
+    try {
+      const response = await submitReservation({
+        customer: {
+          address: customerAddress.trim(),
+          email: customerEmail.trim(),
+          name: customerName.trim(),
+          phone: customerPhone.trim(),
+        },
+        items: selectedMenuItems.map((item) => ({
+          itemId: item.id,
+          quantity: selectedMenus[item.id] ?? 0,
+        })),
+        pickupDate: selectedDate,
+        pickupTime: selectedTime,
+        requestNote: memo.trim(),
+      });
+
+      setReservationNumber(response.reservation.number);
+      setSubmitted(true);
+    } catch {
+      setSubmitError("예약을 접수하지 못했어요. 메뉴와 픽업일을 다시 확인해 주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -242,6 +358,12 @@ export function ReservationPage() {
               </div>
             </div>
 
+            {dataLoadFailed && (
+              <p className="form-error">
+                원격 메뉴 정보를 불러오지 못했어요. 예약 접수는 API 연결을 확인한 뒤 다시 시도해 주세요.
+              </p>
+            )}
+
             <div className="reservation-menu-list">
               {menuItems.map((item) => {
                 const quantity = selectedMenus[item.id] ?? 0;
@@ -303,7 +425,7 @@ export function ReservationPage() {
 
             <div className="calendar-widget" aria-label="예약 가능일 캘린더">
               {pickupDays.map((day) => {
-                const needsMorePrep = getDaysFromBase(day.date) < requiredPrepDays;
+                const needsMorePrep = day.leadDays < requiredPrepDays;
                 const isDisabled =
                   day.status === "day_off" ||
                   needsMorePrep ||
@@ -389,11 +511,16 @@ export function ReservationPage() {
             <span>예약 영수증</span>
           </div>
 
+          {isDataLoading && <p className="surface-message">예약 정보를 불러오는 중이에요.</p>}
+
           {selectedMenuItems.length > 0 ? (
             <div className="receipt-product-list">
               {selectedMenuItems.map((item) => {
               const quantity = selectedMenus[item.id] ?? 0;
-              const maxQuantity = Math.max(1, Math.min(6, selectedDay?.dailyCapacity ?? 6));
+              const maxQuantity = Math.max(
+                1,
+                Math.min(item.maxPerPerson, selectedDay?.dailyCapacity ?? item.maxPerPerson),
+              );
 
               return (
                 <div className="receipt-product" key={item.id}>
@@ -462,13 +589,15 @@ export function ReservationPage() {
 
           <button
             className="submit-reservation"
-            disabled={!isReady}
-            onClick={() => setSubmitted(true)}
+            disabled={!isReady || isSubmitting || dataLoadFailed}
+            onClick={handleSubmit}
             type="button"
           >
             <UserRound size={17} strokeWidth={1.9} />
-            예약 내용 확인
+            {isSubmitting ? "예약 접수 중" : "예약 신청하기"}
           </button>
+
+          {submitError && <p className="form-error">{submitError}</p>}
 
           {submitted && (
             <div className="reservation-result">

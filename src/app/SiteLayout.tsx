@@ -1,11 +1,33 @@
 import { Outlet, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { GiPretzel } from "react-icons/gi";
-import { noticeItems } from "../data/brandShell";
+import { fallbackNoticeItems, loadSiteNotices } from "../lib/bakery-data";
 import { useAuthUser } from "../lib/auth";
 
 export function SiteLayout() {
   const currentUser = useAuthUser();
+  const [noticeItems, setNoticeItems] = useState(fallbackNoticeItems);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    loadSiteNotices()
+      .then((items) => {
+        if (isMounted && items.length > 0) {
+          setNoticeItems(items);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setNoticeItems(fallbackNoticeItems);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <main className="brand-shell">

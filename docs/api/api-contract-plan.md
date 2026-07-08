@@ -12,8 +12,12 @@
 ```txt
 GET  /api/public/site
 GET  /api/public/menus
-GET  /api/public/pickup-days
-GET  /api/public/pickup-days/:date/menus
+GET  /api/public/pickup-rules
+GET  /api/auth/username/check
+POST /api/auth/signup
+POST /api/auth/login
+GET  /api/auth/me
+POST /api/auth/logout
 POST /api/reservations
 GET  /api/reservations/:reservationNumber
 ```

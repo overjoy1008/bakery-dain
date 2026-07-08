@@ -87,6 +87,14 @@ Customer/Admin Browser
 
 프론트엔드는 화면 조립과 사용자 입력에 집중하고, 예약 생성, 가격 확정, 수량 차감, 관리자 권한, 주문 상태 변경은 Worker API에서만 처리합니다.
 
+현재 프론트엔드의 기본 API 주소는 `.env.development`와 `.env.production`에 아래처럼 고정되어 있습니다.
+
+```txt
+VITE_API_BASE_URL=https://bakery-dain-api.overjoy1008.workers.dev/api
+```
+
+따라서 로컬 Vite 화면에서도 회원가입, 로그인, 메뉴 조회, 픽업 규칙 조회, 예약 생성은 원격 Worker를 통해 처리합니다. D1 직접 접근 토큰은 브라우저에 넣지 않습니다.
+
 ## Reference Source
 
 `../TereneHandover`에는 숙박 예약 서비스에서 사용하던 캘린더, 영수증, 관리자 테이블, 인증, API, DB, 알림 구조가 들어 있습니다. Bakery Dain에서는 해당 구조를 다음처럼 축소/변환해서 참고합니다.

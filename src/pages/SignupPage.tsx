@@ -16,6 +16,9 @@ export function SignupPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isChecking, setIsChecking] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const passwordsMatch = password.length > 0 && password === passwordConfirm;
   const hasRequiredFields = useMemo(
@@ -27,35 +30,49 @@ export function SignupPage() {
   );
   const canSubmit = hasRequiredFields && duplicateStatus === "available" && passwordsMatch;
 
-  const handleDuplicateCheck = () => {
+  const handleDuplicateCheck = async () => {
     if (!username.trim()) {
       setDuplicateStatus("idle");
       return;
     }
 
-    setDuplicateStatus(isUsernameTaken(username) ? "taken" : "available");
+    setIsChecking(true);
+    setErrorMessage("");
+
+    try {
+      setDuplicateStatus((await isUsernameTaken(username)) ? "taken" : "available");
+    } catch {
+      setErrorMessage("아이디 확인을 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsChecking(false);
+    }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!canSubmit) {
       return;
     }
 
-    const user = createUser({
-      address: address.trim(),
-      email: email.trim(),
-      name: name.trim(),
-      password,
-      phone: phone.trim(),
-      username: username.trim(),
-    });
+    setIsSubmitting(true);
+    setErrorMessage("");
 
-    if (user) {
+    try {
+      await createUser({
+        address: address.trim(),
+        email: email.trim(),
+        name: name.trim(),
+        password,
+        phone: phone.trim(),
+        username: username.trim(),
+      });
       navigate("/reserve");
-    } else {
+    } catch {
       setDuplicateStatus("taken");
+      setErrorMessage("회원가입을 완료하지 못했어요. 입력 정보를 다시 확인해 주세요.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -81,8 +98,8 @@ export function SignupPage() {
                   required
                   value={username}
                 />
-                <button onClick={handleDuplicateCheck} type="button">
-                  중복확인
+                <button disabled={isChecking} onClick={handleDuplicateCheck} type="button">
+                  {isChecking ? "확인 중" : "중복확인"}
                 </button>
               </div>
               {duplicateStatus === "available" && (
@@ -124,6 +141,7 @@ export function SignupPage() {
             {passwordConfirm && !passwordsMatch && (
               <p className="form-error">비밀번호가 서로 달라요.</p>
             )}
+            {errorMessage && <p className="form-error">{errorMessage}</p>}
 
             <div className="form-grid">
               <label className="form-field">
@@ -172,9 +190,9 @@ export function SignupPage() {
               />
             </label>
 
-            <button className="submit-reservation" disabled={!canSubmit} type="submit">
+            <button className="submit-reservation" disabled={!canSubmit || isSubmitting} type="submit">
               <UserPlus size={17} strokeWidth={1.9} />
-              가입하고 예약하기
+              {isSubmitting ? "가입 중" : "가입하고 예약하기"}
             </button>
           </form>
 

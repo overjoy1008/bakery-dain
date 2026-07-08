@@ -1,0 +1,19 @@
+name = "bakery-dain-api"
+main = "worker/index.ts"
+compatibility_date = "2026-07-07"
+preview_urls = true
+
+[vars]
+ENVIRONMENT = "production"
+ADMIN_USERNAME = "dainkim"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bakery-dain-db"
+database_id = "b3093420-0b52-42e4-82cd-764d0cb559d0"
