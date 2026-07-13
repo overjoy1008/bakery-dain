@@ -10,6 +10,7 @@
 - [Slice 3 Reservation UX Shell](product/slice-3-reservation-ux.md)
 - [Slice 4 Backend Skeleton](product/slice-4-backend-skeleton.md)
 - [Slice 5 Data Layer](product/slice-5-data-layer.md)
+- [Slice 6-7 R2 Media Guard](product/slice-6-7-r2-media.md)
 
 ## Design
 

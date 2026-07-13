@@ -20,6 +20,7 @@ GET  /api/auth/me
 POST /api/auth/logout
 POST /api/reservations
 GET  /api/reservations/:reservationNumber
+GET  /api/media/*
 ```
 
 ## Admin Endpoints
@@ -47,6 +48,10 @@ GET   /api/admin/reservations/:id
 PATCH /api/admin/reservations/:id/status
 
 POST /api/admin/uploads/menu-image
+GET  /api/admin/media/usage
+POST /api/admin/media/usage/sync
+POST /api/admin/media/menu-image
+DELETE /api/admin/media/object/*
 ```
 
 ## Reservation Create Request

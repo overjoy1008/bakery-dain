@@ -286,20 +286,20 @@ bakery-dain/
 - `reservations`
 - `reservation_items`
 
-### Slice 6. Read APIs First
+### Slice 6. Media Guard
 
-- 메뉴 조회 API
-- 예약 가능일 조회 API
-- 날짜별 메뉴 조회 API
-- 프론트 mock 데이터를 실제 API 응답으로 교체
+- private `R2` bucket 연결
+- `MEDIA_BUCKET` Worker binding
+- R2 object metadata D1 저장
+- 월별 storage/Class A/Class B 안전 한도 ledger
+- public bucket 없이 `/api/media/*`로만 이미지 제공
 
-### Slice 7. Write Flow
+### Slice 7. Admin Media Upload
 
-- 예약 생성 API
-- 서버 기준 가격 계산
-- 마감 검증
-- 수량 차감
-- 예약 완료 화면을 실제 응답 기준으로 연결
+- 관리자 메뉴 이미지 업로드 API
+- 업로드 전 R2 budget guard
+- 업로드 성공 시 `items.image_key`, `items.image_url` 연결
+- hourly R2 analytics sync 준비
 
 ### Slice 8. Admin MVP
 
@@ -313,7 +313,7 @@ bakery-dain/
 - `Pages`: 프론트 배포
 - `Workers`: API 배포
 - `D1`: 스키마와 seed 반영
-- `R2`: 메뉴 이미지 업로드 준비
+- `R2`: private media bucket 운영
 
 Cloudflare는 초반부터 모든 설정을 먼저 끝내기보다, 로컬에서 한 slice가 검증될 때마다 필요한 자원만 붙이는 방식으로 진행합니다.
 
@@ -322,8 +322,8 @@ Cloudflare는 초반부터 모든 설정을 먼저 끝내기보다, 로컬에서
 기준 시점: `2026-07-07`, `Asia/Seoul (GMT+9)`
 
 - Cloudflare 계정 생성 및 대시보드 진입 완료
-- 현재는 인프라를 전부 먼저 파기보다, `Pages`, `Workers`, `D1`, `R2`를 필요한 단계에서 순차적으로 활성화합니다
-- 초기 우선순위는 Cloudflare 세팅 자체보다 로컬에서 브랜드 쉘, 메뉴, 예약 UX의 방향을 빠르게 확정하는 것입니다
+- `Workers`, `D1`, `R2`는 원격 Cloudflare에 연결되어 있습니다
+- `R2`는 public access 없이 Worker API 뒤에 둡니다
 
 ## MVP Definition
 

@@ -1,4 +1,4 @@
-import { apiRequest } from "./api";
+import { API_BASE_URL, apiRequest } from "./api";
 import {
   menuCategories as fallbackCategories,
   menuItems as fallbackItems,
@@ -134,7 +134,7 @@ function mapItem(item: ApiItem): BakeryMenuItem {
     categoryLabel: item.category_name,
     description: item.description,
     id: item.id,
-    image: item.image_url ?? "/images/menu/walnut-tart.png",
+    image: normalizeImageUrl(item.image_url),
     imageAlt: item.title,
     maxPerPerson: item.max_per_person,
     name: item.title,
@@ -146,6 +146,18 @@ function mapItem(item: ApiItem): BakeryMenuItem {
     status: limitedQuantity === null ? "예약 가능" : `한정 ${limitedQuantity}개`,
     totalLimitedQuantity: item.total_limited_quantity,
   };
+}
+
+function normalizeImageUrl(imageUrl: string | null) {
+  if (!imageUrl) {
+    return "/images/menu/walnut-tart.png";
+  }
+
+  if (imageUrl.startsWith("/api/")) {
+    return `${API_BASE_URL.replace(/\/api$/, "")}${imageUrl}`;
+  }
+
+  return imageUrl;
 }
 
 function createPickupDays(rule: ApiPickupRule, exceptions: ApiPickupException[]) {

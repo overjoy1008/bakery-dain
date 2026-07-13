@@ -43,19 +43,38 @@ If the dashboard has vars or observability settings that are missing locally, Wr
 
 For Slice 4, keep stable non-secret config in `wrangler.toml`, and keep secrets in Cloudflare Secrets.
 
+## R2 Media
+
+Slice 6-7 uses a private R2 bucket behind the Worker.
+
+- Bucket: `bakery-dain-media`
+- Binding: `MEDIA_BUCKET`
+- Public `r2.dev`: keep disabled
+- Custom public domain: do not connect yet
+- Storage class: Standard
+
+`wrangler.toml` keeps the binding as source of truth:
+
+```toml
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "bakery-dain-media"
+```
+
+The Worker exposes images through `GET /api/media/*` and admin uploads through
+`POST /api/admin/media/menu-image`. The API checks the D1 usage ledger before it calls R2.
+
+Optional actual usage sync needs a Cloudflare Analytics token as a Worker secret:
+
+```bash
+wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN
+```
+
+Without that secret, the hourly cron skips GraphQL sync and keeps using the conservative D1 ledger.
+The production Worker currently has this secret configured and `/api/admin/media/usage/sync`
+returns `skipped=false`.
+
 ## Later Slices
-
-Slice 5:
-
-- Create a D1 database, for example `bakery-dain-db`.
-- Bind it to the Worker as `DB`.
-- Run migrations after the schema is added.
-
-Slice 6-8:
-
-- Create an R2 bucket for menu and hero images, for example `bakery-dain-assets`.
-- Bind it to the Worker as `ASSETS`.
-- Add admin-only upload routes.
 
 Launch:
 

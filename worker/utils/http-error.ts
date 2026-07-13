@@ -7,6 +7,7 @@ export type ErrorCode =
   | "DEADLINE_PASSED"
   | "OUT_OF_STOCK"
   | "CONFLICT"
+  | "USAGE_LIMIT_EXCEEDED"
   | "INTERNAL_ERROR";
 
 type ErrorDetails = Record<string, unknown>;

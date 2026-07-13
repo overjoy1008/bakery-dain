@@ -7,6 +7,7 @@
 - 비회원도 `users`에 `guest` 타입으로 저장해 예약과 결제의 참조 구조를 단순하게 유지합니다.
 - 비밀번호는 평문 저장 금지입니다. Worker에서 hash 후 `password_hash`만 저장합니다.
 - 사진 파일은 R2에 저장하고 DB에는 `image_key` 또는 외부 URL만 저장합니다.
+- R2는 private bucket으로 두고, R2 object metadata와 월별 안전 한도 ledger를 D1에 저장합니다.
 
 ## Status Values
 
@@ -18,6 +19,8 @@ payment_method: bank_transfer
 payment_status: payment_pending, payment_confirmed, refund_pending, refunded, cancelled
 coupon_type: fixed_amount, percent
 pickup_exception_type: unavailable, custom_hours
+r2_object_status: active, deleted
+r2_usage_event_status: reserved, success, failed, blocked, synced
 ```
 
 ## Core Tables

@@ -6,6 +6,7 @@ preview_urls = true
 [vars]
 ENVIRONMENT = "production"
 ADMIN_USERNAME = "dainkim"
+CLOUDFLARE_ACCOUNT_ID = "56aa243b861271060fdf5432b4c181a4"
 
 [observability]
 enabled = true
@@ -13,7 +14,14 @@ enabled = true
 [observability.logs]
 enabled = true
 
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "bakery-dain-media"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "bakery-dain-db"
 database_id = "b3093420-0b52-42e4-82cd-764d0cb559d0"
+
+[triggers]
+crons = ["17 * * * *"]
