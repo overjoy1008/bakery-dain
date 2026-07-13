@@ -18,6 +18,9 @@ POST /api/auth/signup
 POST /api/auth/login
 GET  /api/auth/me
 POST /api/auth/logout
+PATCH /api/users/me
+GET   /api/users/me/reservations
+GET   /api/users/me/reservations/:id
 POST /api/reservations
 GET  /api/reservations/:reservationNumber
 GET  /api/media/*
@@ -31,21 +34,26 @@ POST /api/admin/auth/logout
 GET  /api/admin/me
 
 GET    /api/admin/dashboard
+GET    /api/admin/users
+GET    /api/admin/users/:id
+PATCH  /api/admin/users/:id
+
 GET    /api/admin/menus
 POST   /api/admin/menus
 PATCH  /api/admin/menus/:id
 DELETE /api/admin/menus/:id
 
-GET   /api/admin/pickup-days
-POST  /api/admin/pickup-days
-PATCH /api/admin/pickup-days/:date
-
-GET   /api/admin/pickup-days/:date/menus
-PUT   /api/admin/pickup-days/:date/menus
+GET    /api/admin/pickup-rules
+PUT    /api/admin/pickup-rules
+GET    /api/admin/pickup-exceptions
+POST   /api/admin/pickup-exceptions
+PATCH  /api/admin/pickup-exceptions/:id
+DELETE /api/admin/pickup-exceptions/:id
 
 GET   /api/admin/reservations
 GET   /api/admin/reservations/:id
 PATCH /api/admin/reservations/:id/status
+PATCH /api/admin/reservations/:id/admin-note
 
 POST /api/admin/uploads/menu-image
 GET  /api/admin/media/usage
@@ -80,7 +88,7 @@ DELETE /api/admin/media/object/*
 ```json
 {
   "reservationNumber": "BD-260713-0001",
-  "status": "submitted",
+  "status": "payment_pending",
   "pickupDate": "2026-07-13",
   "pickupTime": "14:00",
   "items": [
@@ -111,13 +119,12 @@ hidden
 ### Reservation
 
 ```txt
-submitted
-confirmed
-preparing
-ready
+payment_pending
+payment_confirmed
+making
+pickup_ready
 picked_up
 cancelled
-no_show
 ```
 
 ## Error Response

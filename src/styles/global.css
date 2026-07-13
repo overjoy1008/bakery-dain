@@ -165,11 +165,13 @@ a {
 .notice-track {
   display: flex;
   width: max-content;
-  animation: marquee 28s linear infinite;
+  animation: marquee 64s linear infinite;
+  will-change: transform;
 }
 
 .notice-track span {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 10px;
   padding: 10px 26px;
@@ -626,7 +628,7 @@ a {
 
 .auth-form {
   display: grid;
-  gap: 2px;
+  gap: 10px;
   margin-top: 28px;
 }
 
@@ -640,9 +642,14 @@ a {
   color: var(--vanilla);
 }
 
+.auth-guest-panel h2 {
+  color: var(--vanilla);
+}
+
 .auth-guest-panel .eyebrow,
-.auth-guest-panel p {
-  color: rgba(255, 248, 237, 0.82);
+.auth-guest-panel p,
+.auth-guest-panel > p:not(.eyebrow) {
+  color: var(--vanilla);
 }
 
 .auth-guest-panel .primary-action {
@@ -974,7 +981,10 @@ a {
 }
 
 .form-field input,
-.form-field textarea {
+.form-field textarea,
+.form-field select,
+.admin-toolbar input,
+.admin-toolbar select {
   width: 100%;
   border: 1px solid rgba(59, 42, 34, 0.14);
   border-radius: 8px;
@@ -983,7 +993,10 @@ a {
   font: inherit;
 }
 
-.form-field input {
+.form-field input,
+.form-field select,
+.admin-toolbar input,
+.admin-toolbar select {
   min-height: 48px;
   padding: 0 14px;
 }
@@ -1168,6 +1181,7 @@ a {
 }
 
 .submit-reservation {
+  margin-top: 18px;
   border: 0;
   background: var(--toast);
   color: var(--vanilla);
@@ -1198,6 +1212,502 @@ a {
 .reservation-result span {
   color: var(--ink-muted);
   line-height: 1.5;
+}
+
+.account-workspace,
+.admin-workspace {
+  display: grid;
+  gap: 18px;
+  padding: 42px clamp(18px, 5vw, 72px) 92px;
+  background:
+    linear-gradient(rgba(255, 253, 248, 0.86), rgba(255, 253, 248, 0.96)),
+    var(--cream);
+}
+
+.account-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.account-tabs button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 1px solid rgba(59, 42, 34, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.78);
+  color: var(--toast);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.account-tabs button[aria-pressed="true"] {
+  border-color: var(--toast);
+  background: var(--toast);
+  color: var(--vanilla);
+}
+
+.admin-tabs {
+  width: 100%;
+  align-items: center;
+}
+
+.admin-tabs-actions {
+  display: inline-flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.account-tabs .admin-refresh-button {
+  border-color: rgba(129, 148, 106, 0.34);
+  background: rgba(129, 148, 106, 0.14);
+  color: var(--leaf);
+}
+
+.account-tabs .admin-logout-button {
+  border-color: rgba(217, 107, 107, 0.34);
+  background: rgba(217, 107, 107, 0.12);
+  color: var(--jam);
+}
+
+.admin-workspace .admin-panel,
+.admin-workspace .admin-stat-grid div,
+.admin-workspace .reservation-list button,
+.admin-workspace .admin-list button,
+.admin-workspace .reservation-detail-panel,
+.admin-workspace .empty-state,
+.admin-workspace .admin-toolbar input,
+.admin-workspace .admin-toolbar select,
+.admin-workspace .form-field input,
+.admin-workspace .form-field select,
+.admin-workspace .form-field textarea,
+.admin-workspace .status-actions button,
+.admin-workspace .danger-action {
+  border-radius: 0;
+}
+
+.admin-workspace .account-tabs button,
+.admin-workspace .weekday-grid button,
+.admin-workspace .submit-reservation {
+  border-radius: 999px;
+}
+
+.account-panel,
+.admin-panel {
+  border: 1px solid rgba(59, 42, 34, 0.13);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.84);
+  box-shadow: 0 18px 46px rgba(59, 42, 34, 0.08);
+  padding: 22px;
+}
+
+.account-info-grid,
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.account-info-grid div,
+.admin-stat-grid div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(59, 42, 34, 0.12);
+  border-radius: 8px;
+  background: var(--cream);
+}
+
+.account-info-grid dt,
+.admin-stat-grid span {
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.account-info-grid dd,
+.admin-stat-grid strong {
+  margin: 0;
+  color: var(--cocoa);
+  font-size: 22px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.account-two-column,
+.admin-two-column {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-menu-layout {
+  grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+}
+
+.reservation-list,
+.admin-list {
+  display: grid;
+  gap: 8px;
+}
+
+.reservation-list button,
+.admin-list button {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  min-height: 78px;
+  padding: 12px;
+  border: 1px solid rgba(59, 42, 34, 0.13);
+  border-radius: 8px;
+  background: var(--cream);
+  color: var(--cocoa);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.reservation-list button[aria-pressed="true"],
+.admin-list button[aria-pressed="true"],
+.admin-list button:hover {
+  border-color: rgba(139, 90, 53, 0.64);
+  background: #fff4da;
+}
+
+.reservation-list span,
+.admin-list span,
+.reservation-list small,
+.admin-list small {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.reservation-detail-panel {
+  border: 1px solid rgba(59, 42, 34, 0.13);
+  border-radius: 8px;
+  background: var(--vanilla);
+  padding: 18px;
+}
+
+.reservation-detail-panel h3,
+.admin-panel h2 {
+  margin: 0 0 14px;
+  color: var(--cocoa);
+  line-height: 1.2;
+}
+
+.detail-item-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.detail-item-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(59, 42, 34, 0.1);
+}
+
+.detail-item-list div:last-child {
+  border-bottom: 0;
+}
+
+.detail-item-list span {
+  color: var(--ink-muted);
+}
+
+.empty-state {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border: 1px dashed rgba(59, 42, 34, 0.24);
+  border-radius: 8px;
+  background: var(--cream);
+}
+
+.admin-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.status-actions,
+.admin-check-row,
+.weekday-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.status-actions button,
+.weekday-grid button,
+.danger-action {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid rgba(59, 42, 34, 0.14);
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--toast);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.weekday-grid button[aria-pressed="true"] {
+  border-color: var(--toast);
+  background: var(--toast);
+  color: var(--vanilla);
+}
+
+.admin-form {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-menu-photo {
+  position: relative;
+  width: min(100%, 420px);
+  height: auto;
+  aspect-ratio: 4 / 3;
+  margin: 0 0 18px;
+}
+
+.admin-menu-photo-button {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(59, 42, 34, 0.16);
+  border-radius: 0;
+  background: var(--cream);
+  color: var(--toast);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.admin-menu-photo-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-menu-photo-button span {
+  display: grid;
+  gap: 8px;
+  place-items: center;
+  padding: 18px;
+  color: var(--toast);
+  font-size: 14px;
+  text-align: center;
+}
+
+.admin-menu-photo-button em {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(59, 42, 34, 0.66);
+  color: var(--vanilla);
+  font-style: normal;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.admin-menu-photo-button:hover em {
+  opacity: 1;
+}
+
+.admin-menu-photo-delete {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(217, 107, 107, 0.32);
+  border-radius: 0;
+  background: var(--vanilla);
+  color: var(--jam);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.admin-menu-photo:hover .admin-menu-photo-delete,
+.admin-menu-photo:focus-within .admin-menu-photo-delete {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.image-modal-backdrop {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(59, 42, 34, 0.42);
+  backdrop-filter: blur(10px);
+}
+
+.image-modal {
+  position: relative;
+  width: min(560px, 100%);
+  padding: 24px;
+  border: 1px solid rgba(59, 42, 34, 0.14);
+  border-radius: 0;
+  background: var(--vanilla);
+  box-shadow: 0 28px 80px rgba(59, 42, 34, 0.24);
+}
+
+.image-modal h2 {
+  margin: 0 0 18px;
+  font-size: 28px;
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(59, 42, 34, 0.12);
+  border-radius: 0;
+  background: var(--cream);
+  color: var(--toast);
+  cursor: pointer;
+}
+
+.image-dropzone {
+  display: grid;
+  min-height: 280px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px dashed rgba(59, 42, 34, 0.28);
+  border-radius: 0;
+  background: var(--cream);
+  color: var(--toast);
+  cursor: pointer;
+  text-align: center;
+}
+
+.image-dropzone span {
+  display: grid;
+  gap: 10px;
+  place-items: center;
+  padding: 24px;
+  font-weight: 700;
+}
+
+.image-dropzone img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.image-dropzone input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-check-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-muted);
+  font-weight: 700;
+}
+
+.check-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(59, 42, 34, 0.72);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  user-select: none;
+}
+
+.check-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.check-control-box {
+  position: relative;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(59, 42, 34, 0.22);
+  border-radius: 6px;
+  background: rgba(255, 253, 248, 0.82);
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.check-control-box::after {
+  width: 9px;
+  height: 5px;
+  border-bottom: 2px solid var(--vanilla);
+  border-left: 2px solid var(--vanilla);
+  content: "";
+  opacity: 0;
+  transform: translateY(-1px) rotate(-45deg);
+}
+
+.check-control input:checked + .check-control-box {
+  border-color: var(--toast);
+  background: var(--toast);
+}
+
+.check-control input:checked + .check-control-box::after {
+  opacity: 1;
+}
+
+.check-control input:focus-visible + .check-control-box {
+  outline: 2px solid rgba(246, 213, 138, 0.95);
+  outline-offset: 2px;
+}
+
+.admin-workspace .check-control-box {
+  border-radius: 0;
+}
+
+.danger-action {
+  width: 100%;
+  margin-top: 8px;
+  border-color: rgba(217, 107, 107, 0.38);
+  background: rgba(217, 107, 107, 0.1);
+  color: var(--jam);
 }
 
 @keyframes marquee {
@@ -1270,7 +1780,12 @@ a {
   .reservation-menu-list,
   .calendar-widget,
   .form-grid,
-  .member-summary {
+  .member-summary,
+  .account-info-grid,
+  .admin-stat-grid,
+  .account-two-column,
+  .admin-two-column,
+  .admin-toolbar {
     grid-template-columns: 1fr;
   }
 

@@ -9,6 +9,7 @@ export type SessionUserRow = {
   name: string;
   phone: string;
   site_username: string;
+  user_type?: "member" | "guest" | "admin";
 };
 
 export function getSessionSecret(env: WorkerEnv) {
@@ -28,6 +29,7 @@ export function toPublicUser(user: SessionUserRow) {
     id: user.id,
     name: user.name,
     phone: user.phone,
+    userType: user.user_type ?? "member",
     username: user.site_username,
   };
 }
@@ -47,7 +49,7 @@ export async function getSessionUser(request: Request, env: WorkerEnv) {
   }
 
   return env.DB.prepare(
-    `SELECT id, site_username, name, phone, email, address
+    `SELECT id, user_type, site_username, name, phone, email, address
      FROM users
      WHERE id = ? AND user_type = 'member'
      LIMIT 1`,
@@ -55,4 +57,3 @@ export async function getSessionUser(request: Request, env: WorkerEnv) {
     .bind(verified.userId)
     .first<SessionUserRow>();
 }
-

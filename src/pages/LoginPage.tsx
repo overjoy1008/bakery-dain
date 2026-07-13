@@ -17,8 +17,8 @@ export function LoginPage() {
     setErrorMessage("");
 
     try {
-      await login(username, password);
-      navigate("/reserve");
+      const response = await login(username, password);
+      navigate(response.redirectTo ?? (response.user.userType === "admin" ? "/admin" : "/mypage"));
     } catch {
       setErrorMessage("아이디 또는 비밀번호를 다시 확인해 주세요.");
     } finally {
@@ -69,7 +69,7 @@ export function LoginPage() {
 
               <button className="submit-reservation" disabled={isSubmitting} type="submit">
                 <UserRound size={17} strokeWidth={1.9} />
-                {isSubmitting ? "로그인 중" : "로그인하고 예약하기"}
+                {isSubmitting ? "로그인 중" : "로그인"}
               </button>
             </form>
 

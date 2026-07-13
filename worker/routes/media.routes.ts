@@ -307,6 +307,11 @@ adminMediaRoutes.delete("/object/*", async (context) => {
       -objectRow.byte_size,
       now,
     ),
+    context.env.DB.prepare(
+      `UPDATE items
+       SET image_key = NULL, image_url = NULL, updated_at = ?
+       WHERE image_key = ?`,
+    ).bind(now, key),
   ]);
 
   return context.json({

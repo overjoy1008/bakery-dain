@@ -91,11 +91,13 @@ authRoutes.post("/signup", async (context) => {
     name: body.name,
     phone: body.phone,
     site_username: username,
+    user_type: "member",
   };
   const token = await createSessionToken(userId, getSessionSecret(context.env));
 
   return context.json(
     {
+      redirectTo: "/mypage",
       token,
       user: toPublicUser(user),
     },
@@ -107,16 +109,40 @@ authRoutes.post("/login", async (context) => {
   const body = await parseJsonBody(context.req.raw, loginSchema);
   const username = body.username.toLowerCase();
   const user = await context.env.DB.prepare(
-    `SELECT id, site_username, password_hash, name, phone, email, address
+    `SELECT id, user_type, site_username, password_hash, name, phone, email, address
      FROM users
-     WHERE lower(site_username) = ? AND user_type = 'member'
+     WHERE lower(site_username) = ? AND user_type IN ('member', 'admin')
      LIMIT 1`,
   )
     .bind(username)
     .first<SessionUserRow & { password_hash: string | null }>();
 
   if (!user || !(await verifyPassword(body.password, user.password_hash))) {
-    throw new HttpError(401, "UNAUTHORIZED", "아이디 또는 비밀번호를 확인해 주세요.");
+    const expectedUsername = context.env.ADMIN_USERNAME?.toLowerCase();
+    const expectedPassword = context.env.ADMIN_PASSWORD;
+    const sessionToken = context.env.ADMIN_SESSION_TOKEN;
+    const isAdmin =
+      Boolean(expectedUsername && expectedPassword && sessionToken) &&
+      username === expectedUsername &&
+      body.password === expectedPassword;
+
+    if (!isAdmin || !sessionToken || !context.env.ADMIN_USERNAME) {
+      throw new HttpError(401, "UNAUTHORIZED", "아이디 또는 비밀번호를 확인해 주세요.");
+    }
+
+    return context.json({
+      redirectTo: "/admin",
+      token: sessionToken,
+      user: {
+        address: "",
+        email: "",
+        id: "usr_admin_owner",
+        name: "다닷네 관리자",
+        phone: "",
+        userType: "admin",
+        username: context.env.ADMIN_USERNAME,
+      },
+    });
   }
 
   await context.env.DB.prepare(
@@ -127,9 +153,27 @@ authRoutes.post("/login", async (context) => {
     .bind(new Date().toISOString(), new Date().toISOString(), user.id)
     .run();
 
+  if (user.user_type === "admin") {
+    const sessionToken = context.env.ADMIN_SESSION_TOKEN;
+
+    if (!sessionToken) {
+      throw new HttpError(500, "INTERNAL_ERROR", "관리자 세션이 아직 설정되지 않았어요.");
+    }
+
+    return context.json({
+      redirectTo: "/admin",
+      token: sessionToken,
+      user: {
+        ...toPublicUser(user),
+        userType: "admin",
+      },
+    });
+  }
+
   const token = await createSessionToken(user.id, getSessionSecret(context.env));
 
   return context.json({
+    redirectTo: "/mypage",
     token,
     user: toPublicUser(user),
   });
@@ -152,4 +196,3 @@ authRoutes.post("/logout", (context) =>
     ok: true,
   }),
 );
-

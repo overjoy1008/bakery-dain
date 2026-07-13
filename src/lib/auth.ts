@@ -11,12 +11,15 @@ export type BakeryUser = {
   address: string;
 };
 
-export type BakerySessionUser = Omit<BakeryUser, "password">;
+export type BakerySessionUser = Omit<BakeryUser, "password"> & {
+  userType?: "member" | "guest" | "admin";
+};
 
 const SESSION_KEY = "bakery-dain-session";
 const AUTH_CHANGE_EVENT = "bakery-dain-auth-change";
 
 type AuthResponse = {
+  redirectTo?: string;
   token: string;
   user: BakerySessionUser;
 };
@@ -71,7 +74,8 @@ export async function createUser(user: BakeryUser) {
     body: user,
     method: "POST",
   });
-  return saveSession(response);
+  saveSession(response);
+  return response;
 }
 
 export async function login(username: string, password: string) {
@@ -82,7 +86,22 @@ export async function login(username: string, password: string) {
     },
     method: "POST",
   });
-  return saveSession(response);
+  saveSession(response);
+  return response;
+}
+
+export function updateStoredUser(user: BakerySessionUser) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const token = getAuthToken();
+
+  if (!token) {
+    return;
+  }
+
+  saveSession({ token, user });
 }
 
 export function logout() {

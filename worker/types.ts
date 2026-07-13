@@ -13,6 +13,7 @@ export type WorkerEnv = {
 export type WorkerVariables = {
   adminUser?: {
     username: string;
+    id?: string;
   };
 };
 

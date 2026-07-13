@@ -59,7 +59,7 @@ export function SignupPage() {
     setErrorMessage("");
 
     try {
-      await createUser({
+      const response = await createUser({
         address: address.trim(),
         email: email.trim(),
         name: name.trim(),
@@ -67,7 +67,7 @@ export function SignupPage() {
         phone: phone.trim(),
         username: username.trim(),
       });
-      navigate("/reserve");
+      navigate(response.redirectTo ?? "/mypage");
     } catch {
       setDuplicateStatus("taken");
       setErrorMessage("회원가입을 완료하지 못했어요. 입력 정보를 다시 확인해 주세요.");

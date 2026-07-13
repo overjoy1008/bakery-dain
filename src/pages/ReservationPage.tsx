@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronDown, Minus, Plus, ReceiptText, ShoppingCart, UserRound } from "lucide-react";
+import { CheckControl } from "../components/CheckControl";
 import { apiRequest } from "../lib/api";
 import {
   fallbackMenuCatalog,
@@ -494,14 +495,11 @@ export function ReservationPage() {
               />
             </label>
 
-            <label className="agreement-row">
-              <input
-                checked={agreed}
-                onChange={(event) => setAgreed(event.target.checked)}
-                type="checkbox"
-              />
-              <span>예약 내용과 픽업 안내를 확인했어요.</span>
-            </label>
+            <div className="agreement-row">
+              <CheckControl checked={agreed} onChange={setAgreed}>
+                예약 내용과 픽업 안내를 확인했어요.
+              </CheckControl>
+            </div>
           </section>
         </div>
 

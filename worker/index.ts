@@ -7,6 +7,7 @@ import { healthRoutes } from "./routes/health.routes";
 import { adminMediaRoutes, mediaRoutes } from "./routes/media.routes";
 import { publicRoutes } from "./routes/public.routes";
 import { reservationRoutes } from "./routes/reservation.routes";
+import { userRoutes } from "./routes/user.routes";
 import type { AppBindings } from "./types";
 import { HttpError, toErrorResponse } from "./utils/http-error";
 import { syncR2UsageFromCloudflare } from "./services/r2-analytics";
@@ -29,6 +30,7 @@ app.route("/auth", authRoutes);
 app.route("/media", mediaRoutes);
 app.route("/public", publicRoutes);
 app.route("/reservations", reservationRoutes);
+app.route("/users", userRoutes);
 
 app.notFound(() => {
   throw new HttpError(404, "NOT_FOUND", "요청한 API를 찾을 수 없어요.");

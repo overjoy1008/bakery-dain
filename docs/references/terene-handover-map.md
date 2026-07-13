@@ -51,6 +51,8 @@ Adaptation:
 ../TereneHandover/terene-framer-frontend/Table/
 ../TereneHandover/terene-framer-frontend/Table/AdminPage/
 ../TereneHandover/terene-framer-frontend/Table/Orders/
+../TereneHandover/terene-framer-frontend/Table/Members/
+../TereneHandover/terene-framer-frontend/Table/MemberPage/
 ```
 
 Use for:
@@ -59,11 +61,14 @@ Use for:
 - 상태 badge
 - 예약 상세 overlay
 - 날짜별 설정 UI
+- 회원 검색/필터 toolbar
+- 회원 정보 상세 table
 
 Adaptation:
 
-- 숙박의 회원/쿠폰/마일리지 탭은 제외합니다.
-- 날짜/메뉴/예약 상태 중심으로 단순화합니다.
+- 숙박의 쿠폰/환불/정산/법인회원 복잡도는 제외합니다.
+- 회원 조회, 내 정보 확인/수정, 픽업 예약 조회, 날짜/메뉴/예약 상태 중심으로 단순화합니다.
+- Terene의 입금 확인/예약 확정 UX는 계좌이체 확인 후 주문 확정 흐름으로 가져옵니다.
 
 ### Auth
 

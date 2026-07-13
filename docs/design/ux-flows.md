@@ -48,6 +48,41 @@ Home
 - 픽업 안내
 - 변경/취소 안내
 
+## Account Flow
+
+```txt
+Login
+  -> 회원 로그인: My Page
+  -> Admin 로그인: Admin Dashboard
+  -> 비회원 예약: Reserve
+```
+
+## My Page Flow
+
+```txt
+My Page
+  -> 내 정보 확인
+  -> 내 정보 수정
+  -> 픽업 예약 목록
+  -> 예약 상세/영수증
+```
+
+회원 마이페이지는 "계정 관리"보다 "내 픽업 예약 확인"을 중심으로 설계합니다.
+
+## Admin Flow
+
+```txt
+Admin Dashboard
+  -> 입금 확인 대기 예약 확인
+  -> 예약 상세
+  -> 입금 확인
+  -> 제작중
+  -> 픽업대기
+  -> 픽업완료
+```
+
+관리자 화면은 TereneHandover의 예약 상세 overlay와 상태 변경 확인 흐름을 참고하되, 베이커리 운영에 필요한 계좌이체 확인과 픽업 상태만 남깁니다.
+
 ## Empty and Error States
 
 - 예약 가능한 날짜가 없을 때: "이번 주 예약은 아직 열리지 않았어요."

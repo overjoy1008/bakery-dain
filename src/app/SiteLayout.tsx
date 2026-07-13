@@ -5,9 +5,12 @@ import { GiPretzel } from "react-icons/gi";
 import { fallbackNoticeItems, loadSiteNotices } from "../lib/bakery-data";
 import { useAuthUser } from "../lib/auth";
 
+const NOTICE_REPEAT_COUNT = 4;
+
 export function SiteLayout() {
   const currentUser = useAuthUser();
   const [noticeItems, setNoticeItems] = useState(fallbackNoticeItems);
+  const noticeLoopItems = Array.from({ length: NOTICE_REPEAT_COUNT * 2 }, () => noticeItems).flat();
 
   useEffect(() => {
     let isMounted = true;
@@ -46,15 +49,19 @@ export function SiteLayout() {
           <Link to="/#about">소개</Link>
         </nav>
 
-        <Link className="account-link" to={currentUser ? "/reserve" : "/login"} aria-label="로그인 또는 마이페이지">
+        <Link
+          className="account-link"
+          to={currentUser?.userType === "admin" ? "/admin" : currentUser ? "/mypage" : "/login"}
+          aria-label="로그인 또는 마이페이지"
+        >
           <UserRound size={17} strokeWidth={1.9} />
-          <span>{currentUser ? "마이페이지" : "로그인"}</span>
+          <span>{currentUser?.userType === "admin" ? "관리자" : currentUser ? "마이페이지" : "로그인"}</span>
         </Link>
       </header>
 
       <section className="notice-rail" aria-label="예약 안내">
         <div className="notice-track">
-          {[...noticeItems, ...noticeItems].map((item, index) => (
+          {noticeLoopItems.map((item, index) => (
             <span key={`${item}-${index}`}>{item}</span>
           ))}
         </div>

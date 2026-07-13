@@ -11,6 +11,7 @@
 - [Slice 4 Backend Skeleton](product/slice-4-backend-skeleton.md)
 - [Slice 5 Data Layer](product/slice-5-data-layer.md)
 - [Slice 6-7 R2 Media Guard](product/slice-6-7-r2-media.md)
+- [Slice 8 My Page and Admin](product/slice-8-mypage-admin.md)
 
 ## Design
 
